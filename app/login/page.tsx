@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -21,7 +22,7 @@ export default function LoginPage() {
         <CardFooter>
           <form
             action={async () => {
-              'use server';
+
               await signIn('github', {
                 redirectTo: '/'
               });
