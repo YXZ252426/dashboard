@@ -3,19 +3,18 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
-  // 从请求中获取 JWT Token
-  const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
+  // 获取用户的身份验证令牌
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
-  // 如果没有 Token 且请求的路径不是 /login，重定向到登录页
+  // 如果用户未登录且请求的路径不是 /login，则重定向到 /login
   if (!token && request.nextUrl.pathname !== '/login') {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 继续正常处理请求
+  // 如果用户已登录或请求的是 /login 页面，则允许请求继续
   return NextResponse.next();
 }
 
-// 配置中间件只对特定路径生效
 export const config = {
-  matcher: ['/((?!login).*)'], // 匹配所有路径，排除 /login
-};
+  matcher: ['/((?!login|api|_next/static|_next/image|favicon.ico).*)'], // 应用中间件到所有非 /login 路径
+}; 

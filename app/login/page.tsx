@@ -1,4 +1,5 @@
-'use client';
+
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -7,7 +8,7 @@ import {
   CardHeader,
   CardTitle
 } from '@/components/ui/card';
-import { signIn } from '@/lib/auth';
+import { signIn } from '@/lib/auth'; // 使用 next-auth 提供的 signIn 函数
 
 export default function LoginPage() {
   return (
@@ -22,7 +23,7 @@ export default function LoginPage() {
         <CardFooter>
           <form
             action={async () => {
-
+              'use server'
               await signIn('github', {
                 redirectTo: '/'
               });
