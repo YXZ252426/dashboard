@@ -4,7 +4,7 @@ export default {
       {
         protocol: 'https',
         hostname: 'avatars.githubusercontent.com',
-        search: ''
+        pathname: '/u/**',
       },
       {
         protocol: 'https',
@@ -14,3 +14,5 @@ export default {
     ]
   }
 };
+
+console.log('Next.js configuration loaded');

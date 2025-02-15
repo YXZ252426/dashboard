@@ -13,8 +13,9 @@ import Link from 'next/link';
 
 export async function User() {
   let session = await auth();
+  console.log('Session:', session);
   let user = session?.user;
-
+  console.log('user.id=',user?.image)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
