@@ -4,7 +4,7 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
   // 获取用户的身份验证令牌
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
 
   // 如果用户未登录且请求的路径不是 /login，则重定向到 /login
   if (!token && request.nextUrl.pathname !== '/login') {
