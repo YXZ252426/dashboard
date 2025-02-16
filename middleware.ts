@@ -6,8 +6,12 @@ export async function middleware(request: NextRequest) {
   // 获取用户的身份验证令牌
   const token = await getToken({ req: request, secret: process.env.AUTH_SECRET });
 
+  // 添加日志记录，检查 token
+  console.log('Token:', token); // 打印获取的 token
+
   // 如果用户未登录且请求的路径不是 /login，则重定向到 /login
   if (!token && request.nextUrl.pathname !== '/login') {
+    console.log('User not authenticated, redirecting to /login'); // 日志记录重定向
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
