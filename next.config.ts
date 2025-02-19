@@ -14,5 +14,3 @@ export default {
     ]
   }
 };
-
-console.log('Next.js configuration loaded');

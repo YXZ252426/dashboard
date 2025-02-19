@@ -1,55 +1,156 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { File, PlusCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ProductsTable } from './products-table';
-import { getProducts } from '@/lib/db';
+// import {
+//   Card,
+//   CardContent,
+//   CardDescription,
+//   CardHeader,
+//   CardTitle
+// } from '@/components/ui/card';
 
-export default async function ProductsPage(
-  props: {
-    searchParams: Promise<{ q: string; offset: string }>;
+// export default function CustomersPage() {
+//   return (
+//     <Card>
+//       <CardHeader>
+//         <CardTitle>Customers</CardTitle>
+//         <CardDescription>View all customers and their orders.</CardDescription>
+//       </CardHeader>
+//       <CardContent></CardContent>
+//     </Card>
+//   );
+// }
+"use client";
+
+import React, { useState, FormEvent } from "react";
+import { Form, Input, Select, Button, Upload } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { ProbabilityChart } from "@/components/ui/chart";
+
+// 文件上传处理
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
   }
-) {
-  const searchParams = await props.searchParams;
-  const search = searchParams.q ?? '';
-  const offset = searchParams.offset ?? 0;
-  const { products, newOffset, totalProducts } = await getProducts(
-    search,
-    Number(offset)
-  );
+  return e?.fileList;
+};
+
+export default function DiagnosisPage() {
+  // 用于存放从后端返回的概率结果
+  const [probabilities, setProbabilities] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // 提交表单
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch("/api/diagnosis", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`);
+      }
+
+      const data = await res.json();
+      // 设置返回的概率数据，进入图表展示模式
+      setProbabilities(data.probabilities);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 重置状态，返回表单界面重新提交
+  const handleReset = () => {
+    setProbabilities([]);
+  };
 
   return (
-    <Tabs defaultValue="all">
-      <div className="flex items-center">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="draft">Draft</TabsTrigger>
-          <TabsTrigger value="archived" className="hidden sm:flex">
-            Archived
-          </TabsTrigger>
-        </TabsList>
-        <div className="ml-auto flex items-center gap-2">
-          <Button size="sm" variant="outline" className="h-8 gap-1">
-            <File className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Export
-            </span>
-          </Button>
-          <Button size="sm" className="h-8 gap-1">
-            <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-              Add Product
-            </span>
-          </Button>
-        </div>
+    <div className="flex justify-center items-center h-screen">
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md text-center">
+        <h1 className="text-2xl font-bold mb-4">疾病诊断</h1>
+
+        {/* 如果成功返回结果，则只展示图表，同时提供返回按钮 */}
+        {probabilities.length > 0 ? (
+          <div className="flex flex-col items-center">
+            <ProbabilityChart probabilities={probabilities} />
+            <Button type="primary" onClick={handleReset} className="mt-4">
+              返回表单重新提交
+            </Button>
+          </div>
+        ) : (
+          <Form
+            layout="vertical"
+            onSubmitCapture={handleSubmit}
+            className="w-full"
+          >
+            {/* 年龄 */}
+            <Form.Item label="年龄" name="Patient-Age">
+              <Input type="number" />
+            </Form.Item>
+
+            {/* 性别 */}
+            <Form.Item label="性别" name="Patient-Sex">
+              <Select>
+                <Select.Option value="true">男</Select.Option>
+                <Select.Option value="false">女</Select.Option>
+              </Select>
+            </Form.Item>
+
+            {/* 左眼眼底图 */}
+            <Form.Item
+              label="左眼眼底图"
+              name="Left-Fundus"
+              valuePropName="fileList"
+              getValueFromEvent={normFile}
+            >
+              <Upload action="/upload.do" listType="picture-card">
+                <Button icon={<PlusOutlined />}>上传</Button>
+              </Upload>
+            </Form.Item>
+
+            {/* 右眼眼底图 */}
+            <Form.Item
+              label="右眼眼底图"
+              name="Right-Fundus"
+              valuePropName="fileList"
+              getValueFromEvent={normFile}
+            >
+              <Upload action="/upload.do" listType="picture-card">
+                <Button icon={<PlusOutlined />}>上传</Button>
+              </Upload>
+            </Form.Item>
+
+            {/* 左眼诊断关键词 */}
+            <Form.Item label="左眼诊断关键词" name="Left-Diagnostic-Keywords">
+              <Input />
+            </Form.Item>
+
+            {/* 右眼诊断关键词 */}
+            <Form.Item label="右眼诊断关键词" name="Right-Diagnostic-Keywords">
+              <Input />
+            </Form.Item>
+
+            {/* 提交按钮 */}
+            <Form.Item>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={loading}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading ? "提交中..." : "提交"}
+              </Button>
+            </Form.Item>
+          </Form>
+        )}
       </div>
-      <TabsContent value="all">
-        <ProductsTable
-          products={products}
-          offset={newOffset ?? 0}
-          totalProducts={totalProducts}
-        />
-      </TabsContent>
-    </Tabs>
+    </div>
   );
 }
