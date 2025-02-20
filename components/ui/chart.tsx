@@ -21,9 +21,9 @@ export function ProbabilityChart({ probabilities }: { probabilities: number[] })
   };
 
   const options = {
-    indexAxis: "y" as const, // 让条形图水平展示，可根据喜好
+    indexAxis: "x" as const, // 让条形图水平展示，可根据喜好
     scales: {
-      x: {
+      y: {
         min: 0,
         max: 1,
         ticks: {
@@ -34,7 +34,7 @@ export function ProbabilityChart({ probabilities }: { probabilities: number[] })
   };
 
   return (
-    <div className="max-w-xl">
+    <div className="max-w-xl w-full">
       <Bar data={data} options={options} />
     </div>
   );

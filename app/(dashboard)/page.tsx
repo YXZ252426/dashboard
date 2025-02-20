@@ -69,21 +69,27 @@ export default function DiagnosisPage() {
   const handleReset = () => {
     setProbabilities([]);
   };
-
-  return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md text-center">
-        <h1 className="text-2xl font-bold mb-4">疾病诊断</h1>
-
-        {/* 如果成功返回结果，则只展示图表，同时提供返回按钮 */}
-        {probabilities.length > 0 ? (
+  if (probabilities.length > 0) {
+    // 如果有结果，显示图表页面（全屏居中）
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+        <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-3xl text-center">
+          <h1 className="text-2xl font-bold mb-4">疾病诊断</h1>
           <div className="flex flex-col items-center">
             <ProbabilityChart probabilities={probabilities} />
             <Button type="primary" onClick={handleReset} className="mt-4">
               返回表单重新提交
             </Button>
           </div>
-        ) : (
+        </div>
+      </div>
+    );
+  } else {
+    // 没有结果，显示表单页面（正常布局）
+    return (
+      <div className="bg-gray-50 min-h-screen p-4">
+        <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-3xl mx-auto">
+          <h1 className="text-2xl font-bold mb-4 text-center">疾病诊断</h1>
           <Form
             layout="vertical"
             onSubmitCapture={handleSubmit}
@@ -149,8 +155,9 @@ export default function DiagnosisPage() {
               </Button>
             </Form.Item>
           </Form>
-        )}
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
+ 
